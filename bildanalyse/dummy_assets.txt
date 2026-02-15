@@ -1,0 +1,7 @@
+
+Hier können lokale Bilddateien (z.B. PNG/JPG) hinterlegt werden.
+Aktuell verwendet die App folgende URL für das Gemälde "Die Freiheit führt das Volk":
+
+https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg/1200px-Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg
+
+Du kannst diese URL in der App.tsx (Variable paintingUrl) gegen einen lokalen Pfad wie './assets/freiheit.png' austauschen.
