@@ -5,7 +5,7 @@ import * as NapoleonData from './bildanalyse/napoleon';
 import { CONTENT_REGISTRY } from './analysisContent';
 import { Infographic } from './bildanalyse/components/Infographic';
 
-// Standard-Daten als Sicherheitsnetz
+// Standard-Daten mit absoluten Pfaden (beginnend mit /)
 const DEFAULT_PAGES: PageEntry[] = [
   {
     "id": "napoleon-1801",
@@ -13,7 +13,7 @@ const DEFAULT_PAGES: PageEntry[] = [
     "subtitle": "Jacques-Louis David • 1801",
     "description": "Napoleon überquert die Alpen",
     "path": "bildanalyse/napoleon",
-    "imageUrl": "assets/images/napoleon-1801.jpg",
+    "imageUrl": "/assets/images/napoleon-1801.jpg",
     "year": 1801,
     "tags": ["NEUZEIT", "FRANKREICH", "MACHTBILD"],
     "focusTag": "MACHTBILD",
@@ -26,7 +26,7 @@ const DEFAULT_PAGES: PageEntry[] = [
     "subtitle": "Eugène Delacroix • 1830",
     "description": "Die Freiheit führt das Volk",
     "path": "bildanalyse/freiheit",
-    "imageUrl": "assets/images/freiheit-1830.jpg",
+    "imageUrl": "/assets/images/freiheit-1830.jpg",
     "year": 1830,
     "tags": ["REVOLUTION", "19. JHD.", "FRANKREICH"],
     "focusTag": "SYMBOLBILD",
@@ -40,9 +40,9 @@ const Timeline: React.FC<{ pages: PageEntry[], onNavigate: (path: string) => voi
   const currentYear = new Date().getFullYear();
   const getPos = (year: number) => {
     const minYear = 1750; 
-    if (year < 1850) return 10 + ((year - 1750) / 100) * 25; 
+    if (year < 1850) return 15 + ((year - 1750) / 100) * 20; 
     if (year < 1945) return 35 + ((year - 1850) / 95) * 35; 
-    return 70 + ((year - 1945) / (currentYear - 1945)) * 25; 
+    return 70 + ((year - 1945) / (currentYear - 1945)) * 20; 
   };
 
   const ticks = [ { y: 1750, l: "1750" }, { y: 1800, l: "1800" }, { y: 1850, l: "1850" }, { y: 1945, l: "1945" }, { y: 1989, l: "1989" }, { y: currentYear, l: "Heute" } ];
