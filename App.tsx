@@ -5,7 +5,7 @@ import * as NapoleonData from './bildanalyse/napoleon';
 import { CONTENT_REGISTRY } from './analysisContent';
 import { Infographic } from './bildanalyse/components/Infographic';
 
-// Standard-Daten mit absoluten Pfaden (beginnend mit /)
+// Standard-Daten mit RELATIVEN PFADEN (sehr robust)
 const DEFAULT_PAGES: PageEntry[] = [
   {
     "id": "napoleon-1801",
@@ -13,7 +13,7 @@ const DEFAULT_PAGES: PageEntry[] = [
     "subtitle": "Jacques-Louis David • 1801",
     "description": "Napoleon überquert die Alpen",
     "path": "bildanalyse/napoleon",
-    "imageUrl": "/assets/images/napoleon-1801.jpg",
+    "imageUrl": "assets/images/napoleon-1801.jpg",
     "year": 1801,
     "tags": ["NEUZEIT", "FRANKREICH", "MACHTBILD"],
     "focusTag": "MACHTBILD",
@@ -26,7 +26,7 @@ const DEFAULT_PAGES: PageEntry[] = [
     "subtitle": "Eugène Delacroix • 1830",
     "description": "Die Freiheit führt das Volk",
     "path": "bildanalyse/freiheit",
-    "imageUrl": "/assets/images/freiheit-1830.jpg",
+    "imageUrl": "assets/images/freiheit-1830.jpg",
     "year": 1830,
     "tags": ["REVOLUTION", "19. JHD.", "FRANKREICH"],
     "focusTag": "SYMBOLBILD",
@@ -69,21 +69,12 @@ const Timeline: React.FC<{ pages: PageEntry[], onNavigate: (path: string) => voi
             return (
               <div key={page.id} className="absolute group z-20 cursor-pointer" style={{ left: `${pos}%` }} onClick={() => onNavigate(page.path)}>
                 <div className={`flex flex-col items-center absolute left-1/2 -translate-x-1/2 ${isTop ? 'bottom-4' : 'top-4'}`}>
-                  {isTop && (
-                    <div className="mb-4 transform transition-all group-hover:-translate-y-2 group-hover:scale-110">
-                      <div className="w-16 h-16 bg-white p-1 rounded-xl shadow-xl border border-slate-200 overflow-hidden group-hover:ring-8 ring-indigo-500/10">
-                        <img src={page.imageUrl} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0" alt={page.title} />
-                      </div>
+                  <div className={`transform transition-all group-hover:scale-110 ${isTop ? 'mb-4 group-hover:-translate-y-2' : 'mt-4 group-hover:translate-y-2'}`}>
+                    <div className="w-16 h-16 bg-white p-1 rounded-xl shadow-xl border border-slate-200 overflow-hidden group-hover:ring-8 ring-indigo-500/10">
+                      <img src={page.imageUrl} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0" alt={page.title} />
                     </div>
-                  )}
+                  </div>
                   <div className="w-4 h-4 bg-indigo-600 rounded-full border-4 border-white shadow-lg group-hover:scale-150 transition-transform"></div>
-                  {!isTop && (
-                    <div className="mt-4 transform transition-all group-hover:translate-y-2 group-hover:scale-110">
-                      <div className="w-16 h-16 bg-white p-1 rounded-xl shadow-xl border border-slate-200 overflow-hidden group-hover:ring-8 ring-indigo-500/10">
-                        <img src={page.imageUrl} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0" alt={page.title} />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -97,7 +88,6 @@ const Timeline: React.FC<{ pages: PageEntry[], onNavigate: (path: string) => voi
 // --- Hilfs-Komponente für interaktiven Text ---
 const InteractiveText: React.FC<{ text: string, className?: string }> = ({ text, className = "text-slate-200 text-lg font-medium leading-relaxed italic" }) => {
   const [explanation, setExplanation] = useState<{ word: string, text: string } | null>(null);
-  const triggerRef = useRef<HTMLSpanElement>(null);
   const parts = text.split(/(\[\[.*?\]\])/g);
 
   return (
@@ -110,7 +100,6 @@ const InteractiveText: React.FC<{ text: string, className?: string }> = ({ text,
             return (
               <span 
                 key={index} 
-                ref={triggerRef}
                 onClick={(e) => { e.stopPropagation(); setExplanation(explanation?.word === word ? null : { word, text: info }); }} 
                 className="text-blue-400 underline decoration-dotted cursor-help font-black px-1 bg-blue-400/10 rounded hover:bg-blue-400/20"
               >
@@ -276,12 +265,10 @@ const BildanalyseApp: React.FC<{ onBack: () => void, page: PageEntry, allPages: 
         {activeStep === 4 && (
           <div className="flex flex-col gap-10">
             <div className="bg-[#0F172A] rounded-[2.5rem] p-10 text-center border-b-8 border-slate-950 shadow-2xl">
-               <h4 className="text-white font-black uppercase text-xs tracking-widest mb-10 opacity-60 italic">Glaubwürdigkeits-Check: Zeigt das Bild die Wahrheit?</h4>
+               <h4 className="text-white font-black uppercase text-xs tracking-widest mb-10 opacity-60 italic">Glaubwürdigkeits-Check</h4>
                <div className="flex justify-center gap-8">
                   {['red', 'yellow', 'green'].map(color => (
-                    <div key={color} className="relative group">
-                       <button onClick={() => setAmpelChoice(color as any)} className={`w-20 h-20 rounded-full border-[6px] transition-all ${color === 'red' ? 'bg-red-600' : color === 'yellow' ? 'bg-yellow-400' : 'bg-green-500'} ${ampelChoice === color ? 'border-white scale-110 shadow-[0_0_30px_rgba(255,255,255,0.5)]' : 'border-black/30 opacity-40 grayscale'}`} />
-                    </div>
+                    <button key={color} onClick={() => setAmpelChoice(color as any)} className={`w-20 h-20 rounded-full border-[6px] transition-all ${color === 'red' ? 'bg-red-600' : color === 'yellow' ? 'bg-yellow-400' : 'bg-green-500'} ${ampelChoice === color ? 'border-white scale-110 shadow-[0_0_30px_white]' : 'border-black/30 opacity-40 grayscale'}`} />
                   ))}
                </div>
                {ampelChoice && <div className="mt-12 p-8 bg-slate-900/50 rounded-3xl font-bold text-slate-200 italic border border-white/10 animate-in fade-in zoom-in-95">{(ampelFeedback as any)[ampelChoice]}</div>}
@@ -292,7 +279,7 @@ const BildanalyseApp: React.FC<{ onBack: () => void, page: PageEntry, allPages: 
         <div className="flex items-center justify-between pt-10 pb-20">
           <button disabled={activeStep === 0} onClick={() => { setActiveStep(prev => prev - 1); window.scrollTo({top: 0}); }} className="flex items-center gap-4 py-5 px-10 rounded-[1.5rem] font-black uppercase text-xs text-slate-400 border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all disabled:opacity-0">Zurück</button>
           <button onClick={() => { if (activeStep < 4) { setActiveStep(prev => prev + 1); window.scrollTo({top: 0}); } else { handlePrint(); } }} className="flex items-center gap-4 py-6 px-14 rounded-[1.5rem] font-black uppercase text-xs text-white bg-indigo-600 shadow-2xl border-b-8 border-indigo-900 hover:bg-indigo-700 transition-all">
-            {activeStep < 4 ? 'Weiter' : 'Analyse abschließen & Drucken'}
+            {activeStep < 4 ? 'Weiter' : 'Abschließen & Drucken'}
           </button>
         </div>
       </main>
@@ -320,7 +307,7 @@ const App: React.FC = () => {
     window.addEventListener('hashchange', handleHashChange);
     handleHashChange();
     
-    fetch('./pages.json')
+    fetch('pages.json')
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setConfig(data); })
       .catch(() => {});
@@ -364,8 +351,8 @@ const App: React.FC = () => {
             </div>
             <input 
               type="text" 
-              placeholder="Suche nach Thema oder Epoche..." 
-              className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-bold text-slate-900 placeholder-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm"
+              placeholder="Suche Thema..." 
+              className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-bold text-slate-900 focus:outline-none focus:border-indigo-500 shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -375,14 +362,12 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {displayedPages.map((page) => (
             <div key={page.id} onClick={() => navigateTo(page.path)} className="group cursor-pointer flex flex-col space-y-6 animate-in fade-in zoom-in-95 duration-700">
-              <div className="relative aspect-[4/5] overflow-hidden bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 bg-white shadow-md transition-all group-hover:shadow-2xl group-hover:border-indigo-100 group-hover:-translate-y-2">
-                <img src={page.imageUrl} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 scale-100 group-hover:scale-105 rounded-xl" alt={page.title} />
+              <div className="relative aspect-[4/5] overflow-hidden bg-white border-2 border-slate-100 rounded-2xl p-3 shadow-md transition-all group-hover:shadow-2xl group-hover:border-indigo-100 group-hover:-translate-y-2">
+                <img src={page.imageUrl} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 rounded-xl" alt={page.title} />
               </div>
               <div className="text-left px-2">
-                <div className="flex gap-2 mb-3">
-                  <span className="text-[9px] font-black text-slate-400 bg-slate-50 uppercase tracking-widest border border-slate-200 px-2 py-0.5 rounded-md">{page.year}</span>
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight group-hover:text-indigo-600 transition-colors">{page.title}</h3>
+                <span className="text-[9px] font-black text-slate-400 bg-slate-50 uppercase tracking-widest border border-slate-200 px-2 py-0.5 rounded-md">{page.year}</span>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight mt-3 group-hover:text-indigo-600 transition-colors">{page.title}</h3>
                 <p className="text-slate-400 text-sm mt-2 font-medium italic leading-relaxed">{page.shortText}</p>
               </div>
             </div>
@@ -390,7 +375,7 @@ const App: React.FC = () => {
         </div>
       </main>
       <footer className="py-24 border-t border-slate-50 text-center text-slate-300 no-print">
-        <p className="text-[10px] font-black uppercase tracking-[0.4em]">&copy; {new Date().getFullYear()} • VISUAL HISTORY • DIGITAL ART ANALYSIS</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em]">&copy; {new Date().getFullYear()} • VISUAL HISTORY</p>
       </footer>
     </div>
   );
