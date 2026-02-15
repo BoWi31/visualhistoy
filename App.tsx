@@ -5,14 +5,45 @@ import * as NapoleonData from './bildanalyse/napoleon';
 import { CONTENT_REGISTRY } from './analysisContent';
 import { Infographic } from './bildanalyse/components/Infographic';
 
+// Standard-Daten falls der Fetch fehlschlägt
+const DEFAULT_PAGES: PageEntry[] = [
+  {
+    "id": "napoleon-1801",
+    "title": "Napoleon überquert die Alpen",
+    "subtitle": "Jacques-Louis David • 1801",
+    "description": "Napoleon überquert die Alpen",
+    "path": "bildanalyse/napoleon",
+    "imageUrl": "assets/images/napoleon-1801.jpg",
+    "year": 1801,
+    "tags": ["NEUZEIT", "FRANKREICH", "MACHTBILD"],
+    "focusTag": "MACHTBILD",
+    "difficulty": 1,
+    "shortText": "Napoleon als strahlender Held auf einem Pferd – Inszenierung oder Wahrheit?"
+  },
+  {
+    "id": "freiheit-1830",
+    "title": "Die Freiheit führt das Volk",
+    "subtitle": "Eugène Delacroix • 1830",
+    "description": "Die Freiheit führt das Volk",
+    "path": "bildanalyse/freiheit",
+    "imageUrl": "assets/images/freiheit-1830.jpg",
+    "year": 1830,
+    "tags": ["REVOLUTION", "19. JHD.", "FRANKREICH"],
+    "focusTag": "SYMBOLBILD",
+    "difficulty": 2,
+    "shortText": "Das berühmte Gemälde zur Julirevolution. Wer ist die Frau in der Mitte?"
+  }
+];
+
 // --- Zeitstrahl Komponente ---
 const Timeline: React.FC<{ pages: PageEntry[], onNavigate: (path: string) => void }> = ({ pages, onNavigate }) => {
   const currentYear = new Date().getFullYear();
   const getPos = (year: number) => {
     const minYear = 1750; 
-    if (year < 1850) return ((year - 1750) / 100) * 10;
-    if (year < 1945) return 10 + ((year - 1850) / 95) * 40;
-    return 50 + ((year - 1945) / (currentYear - 1945)) * 50;
+    // Skalierung für bessere Sichtbarkeit der frühen Ereignisse
+    if (year < 1850) return 5 + ((year - 1750) / 100) * 20; // 1750-1850 nimmt 20% ein
+    if (year < 1945) return 25 + ((year - 1850) / 95) * 35; // 1850-1945 nimmt 35% ein
+    return 60 + ((year - 1945) / (currentYear - 1945)) * 35; // Rest bis heute
   };
 
   const ticks = [ { y: 1750, l: "1750" }, { y: 1800, l: "1800" }, { y: 1850, l: "1850" }, { y: 1945, l: "1945" }, { y: 1989, l: "1989" }, { y: currentYear, l: "Heute" } ];
@@ -287,8 +318,12 @@ const BildanalyseApp: React.FC<{ onBack: () => void, page: PageEntry, allPages: 
 };
 
 const App: React.FC = () => {
-  const [config, setConfig] = useState<ConfigData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [config, setConfig] = useState<ConfigData | null>({
+    title: "Visual History",
+    subtitle: "Digitale Bildanalyse für den Geschichtsunterricht an der BoWi",
+    pages: DEFAULT_PAGES
+  });
+  const [loading, setLoading] = useState(false); // Direkt auf false setzen da wir Standarddaten haben
   const [activeView, setActiveView] = useState<string | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -298,19 +333,13 @@ const App: React.FC = () => {
     window.addEventListener('hashchange', handleHashChange);
     handleHashChange();
     
+    // Optionaler Fetch für dynamische Updates
     fetch('./pages.json')
-      .then(res => {
-        if (!res.ok) throw new Error("Netzwerk-Antwort war nicht ok");
-        return res.json();
-      })
+      .then(res => res.ok ? res.json() : null)
       .then(data => { 
-        setConfig(data); 
-        setLoading(false); 
+        if (data) setConfig(data);
       })
-      .catch(err => { 
-        console.error("Fehler beim Laden von pages.json:", err);
-        setLoading(false); 
-      });
+      .catch(() => {}); // Fehler ignorieren, Fallback wird genutzt
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
