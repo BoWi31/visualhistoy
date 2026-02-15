@@ -1,0 +1,13 @@
+
+HINTERLEGEN VON BILDDATEIEN:
+----------------------------
+Um eine eigene Bilddatei (z.B. "freiheit.png") zu verwenden, gehe wie folgt vor:
+
+1. Speichere deine Bilddatei in diesem Ordner oder einem Unterordner (z.B. assets/).
+2. Öffne die Datei "App.tsx".
+3. Suche die Zeile: 
+   const paintingUrl = "https://upload.wikimedia.org/wikipedia/commons/...";
+4. Ersetze die URL durch deinen lokalen Pfad:
+   const paintingUrl = "./assets/freiheit.png";
+
+Die Lupe und alle Analyse-Funktionen arbeiten automatisch mit der neuen Datei.
